@@ -43,3 +43,24 @@ def trigger_ingestion(background_tasks: BackgroundTasks) -> Dict[str, bool]:
 def trigger_report() -> Dict[str, bool]:
     generate_daily_report()
     return {"success": True}
+
+# Serve React Frontend (For Render/Docker deployment)
+import os
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
+
+DIST_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "dist")
+
+if os.path.exists(DIST_DIR):
+    # Mount the assets directory (CSS, JS, images from Vite)
+    assets_dir = os.path.join(DIST_DIR, "assets")
+    if os.path.exists(assets_dir):
+        app.mount("/assets", StaticFiles(directory=assets_dir), name="assets")
+    
+    # Catch-all to serve index.html for React Router / specific files
+    @app.get("/{full_path:path}")
+    def serve_react_app(full_path: str):
+        file_path = os.path.join(DIST_DIR, full_path)
+        if os.path.isfile(file_path):
+            return FileResponse(file_path)
+        return FileResponse(os.path.join(DIST_DIR, "index.html"))
