@@ -1,6 +1,6 @@
 # Automated Risk Intelligence Analyst
 
-An AI-powered, full-stack application that monitors, analyzes, and visualizes geopolitical and macroeconomic risks in real-time. It ingests news data, uses AI to evaluate risk severity and sentiment, and presents actionable insights through an interactive dashboard.
+An AI-powered, full-stack application that monitors, analyzes, and visualizes geopolitical and macroeconomic risks in real-time. It ingests news data, uses AI to evaluate risk severity and sentiment, and delivers actionable intelligence through an intuitive dashboard and daily executive briefings.
 
 ## Features
 
@@ -20,6 +20,28 @@ An AI-powered, full-stack application that monitors, analyzes, and visualizes ge
 - Node.js 18+
 - Python 3.11+
 - A Google Gemini API Key
+
+## Screenshots
+
+### Dashboard Overview
+The main dashboard displays real-time risk intelligence with daily AI briefings and classified intelligence feed:
+
+![Risk Intelligence Dashboard - Main View](https://github.com/thedeepakreddy/Automated-Risk-Intelligence-Analyst/assets/images/dashboard-1.png)
+
+### Visual Analytics
+Comprehensive visual summary including news volume by category, sentiment trends by asset class, and 7-day risk heatmap:
+
+![Visual Summary and Risk Heatmap](https://github.com/thedeepakreddy/Automated-Risk-Intelligence-Analyst/assets/images/dashboard-2.png)
+
+### Risk Metrics & Timeline
+Master risk score gauge, high anomalies counter, processed articles count, and historical score timeline (last 7 days):
+
+![Risk Metrics and Score Timeline](https://github.com/thedeepakreddy/Automated-Risk-Intelligence-Analyst/assets/images/dashboard-3.png)
+
+### System Status & Intelligence Feed
+Global macro risk intelligence overview showing data ingestion sources, processing engines, AI inference capabilities, and critical risk alerts:
+
+![System Status and Intelligence Overview](https://github.com/thedeepakreddy/Automated-Risk-Intelligence-Analyst/assets/images/dashboard-4.png)
 
 ## Local Development
 
@@ -60,7 +82,7 @@ The FastAPI backend runs on `http://localhost:8000`.
 
 ## Deployment (Render via Docker)
 
-This application is fully Dockerized for deployment on platforms like Render. The `Dockerfile` handles building the React frontend and setting up the FastAPI backend to serve both the API and the static UI assets.
+This application is fully Dockerized for deployment on platforms like Render. The `Dockerfile` handles building the React frontend and setting up the FastAPI backend to serve both the API and the static files seamlessly.
 
 1. Create a **New Web Service** on Render.
 2. Select your connected GitHub repository.
