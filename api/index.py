@@ -2,8 +2,10 @@ from fastapi import FastAPI, BackgroundTasks
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from typing import Dict, Any
+import asyncio
+import os
 
-from api._db import init_db, get_dashboard_data
+from api._db import init_db, get_dashboard_data, get_db
 from api._ingestion import run_ingestion_cycle
 from api._reporter import generate_daily_report
 
@@ -18,8 +20,40 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Initialize the SQLite Database (stored in /tmp/ for serverless environments)
-init_db()
+async def periodic_ingestion():
+    while True:
+        try:
+            run_ingestion_cycle()
+        except Exception as e:
+            print("Error in ingestion process:", e)
+        await asyncio.sleep(1800)  # Every 30 minutes
+
+async def periodic_reporter():
+    while True:
+        try:
+            generate_daily_report()
+        except Exception as e:
+            print("Error in reporter process:", e)
+        await asyncio.sleep(86400) # Every 24 hours
+
+@app.on_event("startup")
+async def startup_event():
+    # Initialize the SQLite Database (stored in /tmp/ for serverless environments)
+    init_db()
+    
+    # Check if database is empty to immediately seed some data
+    conn = get_db()
+    count = conn.execute("SELECT COUNT(*) FROM articles").fetchone()[0]
+    conn.close()
+    
+    if count == 0:
+        print("Database is empty, running initial seed...")
+        run_ingestion_cycle()
+        generate_daily_report()
+    
+    # Start periodic background tasks
+    asyncio.create_task(periodic_ingestion())
+    asyncio.create_task(periodic_reporter())
 
 @app.get("/api/health")
 @app.get("/api/status")
