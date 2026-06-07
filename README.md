@@ -23,11 +23,6 @@ An AI-powered, full-stack application that monitors, analyzes, and visualizes ge
 
 ## Screenshots
 
-### Dashboard Overview
-The main dashboard displays real-time risk intelligence with daily AI briefings and classified intelligence feed:
-
-![Risk Intelligence Dashboard - Main View](./assets/000.png)
-
 ### Visual Analytics
 Comprehensive visual summary including news volume by category, sentiment trends by asset class, and 7-day risk heatmap:
 
@@ -42,6 +37,11 @@ Master risk score gauge, high anomalies counter, processed articles count, and h
 Global macro risk intelligence overview showing data ingestion sources, processing engines, AI inference capabilities, and critical risk alerts:
 
 ![System Status and Intelligence Overview](./assets/789.png)
+
+### Dashboard Overview
+The main dashboard displays real-time risk intelligence with daily AI briefings and classified intelligence feed:
+
+![Risk Intelligence Dashboard - Main View](./assets/000.png)
 
 ## Local Development
 
