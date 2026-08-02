@@ -1,0 +1,43 @@
+# Render Blueprint. Point Render at this repo and it provisions the service
+# from here instead of from manually-entered dashboard settings.
+#
+# The Docker runtime is deliberate: the multi-stage Dockerfile builds the React
+# bundle on node:20-alpine and copies dist/ into the Python image, which FastAPI
+# then serves alongside the API. On Render's native Python runtime nothing runs
+# `npm run build`, so dist/ never exists and every non-/api route 404s.
+#
+# Build and start commands are intentionally absent -- the Dockerfile supplies
+# both. Do not set a start command here; anything set overrides the Dockerfile
+# CMD, and pasting the CMD line verbatim runs `CMD` as a shell program.
+services:
+  - type: web
+    name: risk-intelligence-analyst
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    plan: free
+    healthCheckPath: /api/health
+    autoDeploy: true
+    envVars:
+      # Marked sync:false so Render prompts for it rather than storing a secret
+      # in the repo. Without it the pipeline still runs, but every article is
+      # stamped classificationMode='degraded-keyword' and briefings are
+      # templated -- functional, and honest about being downgraded.
+      - key: GEMINI_API_KEY
+        sync: false
+
+      # Ingestion and scoring run inside the app's lifespan, so more than one
+      # worker means N schedulers against one SQLite file: N times the Gemini
+      # spend and N duplicate score rows per cycle.
+      - key: WEB_CONCURRENCY
+        value: "1"
+
+# The default DB_PATH (/tmp/risk.db) is wiped on every deploy and restart, so
+# history restarts from empty and news-flow volatility is excluded from the
+# score until three hourly buckets exist (~3h). To keep history across deploys,
+# uncomment the disk below and set DB_PATH=/data/risk.db. Note that attaching a
+# disk pins the service to one instance and disables zero-downtime deploys.
+#
+#    disk:
+#      name: risk-db
+#      mountPath: /data
+#      sizeGB: 1
