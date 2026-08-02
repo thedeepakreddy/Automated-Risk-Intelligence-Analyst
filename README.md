@@ -178,6 +178,9 @@ The suite covers the classification schema contract (including that an off-contr
 |---|---|---|
 | `GEMINI_API_KEY` | - | Enables real classification and AI briefings. Absent = degraded mode. |
 | `GEMINI_MODEL` | `gemini-2.5-flash` | Inference model. |
+| `GEMINI_MAX_RPM` | `10` | Requests/minute ceiling for classification. Matches the free tier; raise it on a paid key, set `0` to disable pacing. |
+| `GEMINI_MAX_RETRIES` | `2` | Retries on a throttled (429) or transient (5xx) response, with exponential backoff. |
+| `GEMINI_BREAKER_THRESHOLD` | `3` | Consecutive quota failures before the cycle stops calling Gemini and finishes on the keyword classifier. |
 | `RSS_FEEDS` | built-in list | Comma-separated `Name\|URL` overrides for the news sources. |
 | `MAX_ARTICLES_PER_CYCLE` | `20` | Headlines admitted per cycle. |
 | `MAX_ARTICLES_PER_FEED` | `10` | Headlines taken from any one source before moving on. |
@@ -230,6 +233,7 @@ Stated openly, because a risk model that hides its assumptions is not a risk mod
 - **Degraded-mode sentiment uses VADER**, a lexicon tuned for general English rather than financial text. A finance-specific model (for example, FinBERT) would be the natural next upgrade.
 - **Coverage is headline-level.** The system reads titles and RSS summaries, not full article bodies or filings.
 - **RSS sources are best-effort.** Publishers retire and rate-limit feeds without notice. Sources are configurable via `RSS_FEEDS`, failures are logged per source, and the cycle proceeds on whatever remains.
+- **LLM throughput is the binding constraint on cycle size.** One classification call per headline against a free-tier quota of roughly 10 requests/minute means a 20-headline cycle takes about two minutes of wall clock, and 48 cycles a day will exceed a free daily cap well before midnight. Calls are paced, throttled responses retried with backoff, and a breaker stops the cycle asking once the quota is genuinely spent — but the real fix at volume is batching several headlines per request, or a paid tier. Until then, `MAX_ARTICLES_PER_CYCLE` and `INGESTION_INTERVAL_SECONDS` are the dials that keep a day's ingestion inside a day's quota.
 
 ---
 
